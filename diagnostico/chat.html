@@ -1,0 +1,93 @@
+<style>
+:root{--me:#fff6b8;--bgc:#ece5dd}
+html,body{height:100%}
+body{background:#0b0b0b;display:flex;justify-content:center}
+.app{width:100%;max-width:480px;height:100dvh;display:flex;flex-direction:column;background:var(--bgc) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='1.2' fill='%23cfc6b8'/%3E%3C/svg%3E");color:#111}
+.hd{background:#121212;color:#fff;display:flex;align-items:center;gap:12px;padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top))}
+.hd a.back{color:#fff;text-decoration:none;font-size:22px;line-height:1;opacity:.8;padding-right:2px}
+.av{width:42px;height:42px;border-radius:50%;overflow:hidden;flex:none;border:2px solid var(--gold)}
+.av img{width:100%;height:100%;object-fit:cover;object-position:top}
+.hd b{display:block;font-size:16px;font-family:Montserrat,sans-serif}
+.hd small{font-size:12.5px;opacity:.75}
+#chat{flex:1;overflow-y:auto;padding:16px 12px 8px;display:flex;flex-direction:column;gap:6px}
+.m{max-width:84%;padding:9px 12px 8px;border-radius:12px;font-size:15.5px;line-height:1.4;box-shadow:0 1px .5px #0002;animation:in .25s ease-out}
+.v{align-self:flex-start;background:#fff;border-top-left-radius:4px}
+.u{align-self:flex-end;background:var(--me);border-top-right-radius:4px}
+.typing{align-self:flex-start;background:#fff;border-radius:12px;padding:12px 14px;display:flex;gap:4px}
+.typing i{width:7px;height:7px;border-radius:50%;background:#9aa3ad;animation:b 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes b{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-4px);opacity:1}}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+#reply{padding:10px 12px;padding-bottom:max(12px,env(safe-area-inset-bottom));background:#f4efe8;border-top:1px solid #0001;display:flex;flex-wrap:wrap;gap:8px;min-height:62px;align-items:center}
+.chip{border:1.5px solid #121212;background:#fff;color:#121212;font-size:15px;font-weight:600;padding:9px 14px;border-radius:20px;cursor:pointer;font-family:Inter,sans-serif}
+.chip:active{background:var(--gold)}
+.row{display:flex;gap:8px;width:100%}
+.row input{flex:1;font-size:16px;padding:11px 14px;border-radius:22px;border:1.5px solid #0002;outline:none;font-family:Inter,sans-serif}
+.send{background:#121212;color:#fff;border:0;border-radius:50%;width:44px;height:44px;font-size:18px;cursor:pointer;flex:none}
+.wa{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:var(--wa);color:#fff;text-decoration:none;font-weight:700;font-size:17px;padding:14px;border-radius:26px;font-family:Montserrat,sans-serif}
+.wa svg{width:22px;height:22px}
+.fine{width:100%;text-align:center;font-size:11.5px;color:#6b6b6b;margin-top:2px}
+</style>
+<div class="app">
+  <div class="hd"><a class="back" href="/" aria-label="Voltar ao site">‹</a><div class="av"><img src="/img/vanessa-photo-2.jpg" alt="Vanessa"></div><div><b>Vanessa Kreitchmann</b><small id="st">online</small></div></div>
+  <div id="chat"></div>
+  <div id="reply"></div>
+</div>
+<script>
+const WHATSAPP = "555189418635";
+const chat=document.getElementById('chat'), reply=document.getElementById('reply'), st=document.getElementById('st');
+const utm=new URLSearchParams(location.search);
+const origem=["utm_source","utm_campaign","utm_content"].map(k=>utm.get(k)).filter(Boolean).join(" / ")||"site";
+const A={};
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const scroll=()=>chat.scrollTop=chat.scrollHeight;
+async function say(html){
+  st.textContent="digitando…";
+  const t=document.createElement('div');t.className='typing';t.innerHTML='<i></i><i></i><i></i>';chat.appendChild(t);scroll();
+  await wait(Math.min(450+html.replace(/<[^>]+>/g,'').length*13,1500));
+  t.remove();st.textContent="online";
+  const m=document.createElement('div');m.className='m v';m.innerHTML=html;chat.appendChild(m);scroll();await wait(250);
+}
+function me(text){const m=document.createElement('div');m.className='m u';m.textContent=text;chat.appendChild(m);scroll()}
+function choose(opts){return new Promise(res=>{reply.innerHTML='';opts.forEach(o=>{const b=document.createElement('button');b.className='chip';b.textContent=o;b.onclick=()=>{reply.innerHTML='';me(o);res(o)};reply.appendChild(b)})})}
+function ask(ph){return new Promise(res=>{reply.innerHTML=`<div class="row"><input id="tx" placeholder="${ph}" maxlength="80" autocomplete="off"><button class="send" id="sd" aria-label="Enviar">➤</button></div>`;
+  const tx=document.getElementById('tx'),go=()=>{const v=tx.value.trim()||"Não sei";reply.innerHTML='';me(v);res(v)};
+  document.getElementById('sd').onclick=go;tx.onkeydown=e=>{if(e.key==='Enter')go()};tx.focus({preventScroll:true});})}
+const WA_ICON='<svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm4.5 12.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.2c0-.1-.2-.2-.4-.3z"/></svg>';
+const track=(ev,data)=>{try{fbq('track',ev,data)}catch(e){}try{ttq.track(ev==='Contact'?'Contact':'SubmitForm')}catch(e){}};
+
+(async()=>{
+  await wait(400);
+  await say("Oi! Aqui é a Vanessa 👋🎾");
+  await say("Em 5 perguntinhas rápidas eu já consigo ter uma primeira ideia se a tua raquete está te ajudando ou atrapalhando.");
+  await say("Pra começar: qual a tua <b>categoria</b> hoje?");
+  A.categoria=await choose(["Iniciante","D","C","B","A / Pro"]);
+  await say(A.categoria==="Iniciante"?"Que bom que tá começando! É a melhor hora pra acertar a raquete 😉":`Boa! Categoria ${A.categoria} 💪`);
+  await say("E quantas vezes por semana você joga?");
+  A.freq=await choose(["1x","2x","3x","4x ou mais"]);
+  await say("Você sente algum <b>desconforto</b> depois de jogar?");
+  A.dor=await choose(["Cotovelo","Ombro","Punho / mão","Outro lugar","Não sinto nada"]);
+  const dor=A.dor!=="Não sinto nada";
+  if(dor){await say(`Entendi. Desconforto no ${A.dor.toLowerCase()} é o relato que eu mais escuto nas consultorias, e muitas vezes tem a ver com peso, balance ou rigidez da raquete.`)}
+  else{await say("Ótimo! Então dá pra focar em extrair o máximo do teu jogo 🙌")}
+  await say("Qual <b>raquete</b> você usa hoje? Se souber o peso, melhor ainda.");
+  A.raquete=await ask("Ex.: Shark Predator, 360g");
+  await say("E pra eu te chamar pelo nome: como você se chama?");
+  A.nome=await ask("Seu nome");
+  track('Lead',{content_category:A.categoria,content_name:A.dor});
+  const comp=["C","D"].includes(A.categoria), ini=A.categoria==="Iniciante";
+  await say(dor
+    ? `Obrigada, ${A.nome}! Pelo que você contou, <b>vale muito olhar a configuração da tua raquete</b>. Às vezes nem precisa trocar, só ajustar.`
+    : ini ? `Obrigada, ${A.nome}! Pra quem tá começando, <b>acertar a primeira raquete</b> faz o jogo evoluir bem mais rápido.`
+    : comp ? `Obrigada, ${A.nome}! Na categoria ${A.categoria}, <b>a configuração certa</b> faz muita diferença em controle e consistência nos torneios.`
+    : `Obrigada, ${A.nome}! Com peso, balance e EVA alinhados ao teu estilo, dá pra ganhar controle e conforto.`);
+  await say("Funciona assim: a <b>Consultoria Completa</b> é uma videochamada de 30 a 45 minutos comigo, com acompanhamento da adaptação. Investimento: <b>R$ 390 no PIX</b> ou <b>R$ 415 em até 2x</b> no cartão.");
+  await say("Também tem a <b>Consultoria Express</b> por <b>R$ 197</b>, com análise por áudio e mensagem, sem videochamada.");
+  await say("Qual faz mais sentido pra você?");
+  A.opcao=await choose(["Completa — PIX R$ 390","Completa — cartão 2x R$ 415","Express — R$ 197","Quero tirar dúvidas antes"]);
+  await say(A.opcao.startsWith("Quero")?"Claro! Me chama no WhatsApp que eu te explico tudo 💛":"Perfeito! Me chama no WhatsApp que eu já recebo tuas respostas e te passo os horários e os próximos passos 💛");
+  const msg=`Oi Vanessa! Sou ${A.nome} e fiz a pré-avaliação da raquete:\n• Categoria: ${A.categoria}\n• Jogo: ${A.freq} por semana\n• Desconforto: ${A.dor}\n• Raquete: ${A.raquete}\n• Interesse: ${A.opcao}\n(origem: ${origem})`;
+  reply.innerHTML=`<a class="wa" id="wa" target="_blank" rel="noopener" href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}">${WA_ICON}Continuar no WhatsApp</a><div class="fine">Consultoria de equipamento. Não substitui avaliação médica.</div>`;
+  document.getElementById('wa').onclick=()=>track('Contact',{content_category:A.categoria,content_name:A.opcao});
+})();
+</script>
