@@ -5,7 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent
 WA = "555189418635"
-GROUP_URL = "https://chat.whatsapp.com/LCczLtFWGBV4lHPSXClOZQ?s=cl&p=i&iam=2"
+GROUP_URL = "https://chat.whatsapp.com/CVVTLax1o7lLS6nhViTWq8?s=cl&p=i&iam=2"
 OG_IMG = "https://vanessakreitchmann.com.br/img/vanessa-hero.jpg"
 
 FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
