@@ -54,9 +54,9 @@ const scroll=()=>chat.scrollTop=chat.scrollHeight;
 async function say(html){
   st.textContent="digitando…";
   const t=document.createElement('div');t.className='typing';t.innerHTML='<i></i><i></i><i></i>';chat.appendChild(t);scroll();
-  await wait(Math.min(450+html.replace(/<[^>]+>/g,'').length*13,1500));
+  await wait(Math.min(700+html.replace(/<[^>]+>/g,'').length*20,2300));
   t.remove();st.textContent="Online agora";
-  chat.querySelectorAll('.ln.last').forEach(x=>x.classList.remove('last'));const l=document.createElement('div');l.className='ln last';l.innerHTML='<div class="mini"><img src="/img/vanessa-perfil.jpg" alt=""></div>';const m=document.createElement('div');m.className='m v';m.innerHTML=html;l.appendChild(m);chat.appendChild(l);scroll();await wait(250);
+  chat.querySelectorAll('.ln.last').forEach(x=>x.classList.remove('last'));const l=document.createElement('div');l.className='ln last';l.innerHTML='<div class="mini"><img src="/img/vanessa-perfil.jpg" alt=""></div>';const m=document.createElement('div');m.className='m v';m.innerHTML=html;l.appendChild(m);chat.appendChild(l);scroll();await wait(450);
 }
 function me(text){const m=document.createElement('div');m.className='m u';m.textContent=text;chat.appendChild(m);scroll()}
 function choose(opts){return new Promise(res=>{reply.innerHTML='';opts.forEach(o=>{const b=document.createElement('button');b.className='chip';b.textContent=o;b.onclick=()=>{reply.innerHTML='';me(o);res(o)};reply.appendChild(b)})})}
@@ -88,12 +88,11 @@ function perfil(){
 (async()=>{
   await wait(400);
   await say("Oi! Aqui é a Vanessa 👋🎾");
-  await say("Já são <b>mais de 80 mil consultorias realizadas</b>, com atletas de <b>mais de 12 países</b> 🌎");
-  await say("E já participei do lançamento de <b>mais de 50 marcas</b> no mercado. Então eu conheço raquete por dentro 🏆");
-  await say("Vamos descobrir se a sua raquete <b>combina com o seu jogo</b>? São 7 perguntinhas rápidas, menos de 1 minuto.");
-  await say("Ah, antes: eu <b>não vendo raquetes</b>. Meu trabalho é te ajudar a escolher a certa, sem interesse em marca 😉");
+  await say("Já fiz <b>mais de 80 mil consultorias</b>, com atletas de 12 países 🌎");
+  await say("E não, eu <b>não vendo raquete</b> 😉 Te ajudo a escolher a certa.");
+  await say("Bora ver se a sua <b>combina com o seu jogo</b>? São 7 perguntas rapidinhas.");
   try{fbq('track','ViewContent',{content_name:'quiz_inicio'})}catch(e){}
-  await say("Pra começar: qual a sua <b>categoria</b> hoje?");
+  await say("Qual a sua <b>categoria</b> hoje?");
   A.categoria=await choose(["Iniciante","D","C","B","A / Pro"]);
   await say(A.categoria==="Iniciante"?"Que bom que tá começando! É a melhor hora pra acertar a raquete 😉":`Boa! Categoria ${A.categoria} 💪`);
   await say("Quantas vezes por semana você joga?");
@@ -102,7 +101,7 @@ function perfil(){
   A.torneio=await choose(["Sim, com frequência","De vez em quando","Não, jogo por diversão"]);
   await say("Você sente algum <b>desconforto</b> depois de jogar?");
   A.dor=await choose(["Cotovelo","Ombro","Punho / mão","Outro lugar","Não sinto nada"]);
-  if(A.dor!=="Não sinto nada")await say(`Hum, ${A.dor.toLowerCase()}… esse é o relato que eu mais escuto nas consultorias.`);
+  if(A.dor!=="Não sinto nada")await say(`Hum, ${A.dor.toLowerCase()}… é o que eu mais escuto nas consultorias.`);
   await say("O que mais te <b>incomoda</b> no seu jogo hoje?");
   A.incomoda=await choose(["Falta potência","Falta controle","Canso rápido","Ainda não tenho raquete","Nada específico"]);
   if(A.incomoda!=="Ainda não tenho raquete"){await say("Qual <b>raquete</b> você usa hoje? Se souber o peso, melhor ainda.");A.raquete=await ask("Ex.: Shark Predator, 360g")}else A.raquete="Ainda não tenho";
@@ -112,9 +111,8 @@ function perfil(){
   track('Lead',{content_category:A.categoria,content_name:P.n});
   await say(`Prontinho, ${A.nome}! Seu perfil é:<br><b>🎾 ${P.n}</b>`);
   await say(P.p);
-  await say("O que costuma acontecer nesse perfil:<br>"+P.b.map(x=>"✓ "+x).join("<br>"));
-  await say("Na consultoria eu analiso o seu jogo e te digo <b>exatamente qual configuração é a certa pra você</b>. Pode ser por videochamada (Completa) ou por áudio e mensagem (Express).");
-  await say("Quer que eu te explique como funciona? Me chama no WhatsApp que suas respostas já vão junto 💛");
+  await say("Na consultoria eu te digo <b>exatamente qual configuração é a certa pra você</b>.");
+  await say("Me chama no WhatsApp que suas respostas já vão junto 💛");
   const msg=`Oi Vanessa! Sou ${A.nome} e fiz o teste da raquete no seu site.\n• Meu perfil: ${P.n}\n• Categoria: ${A.categoria}\n• Jogo: ${A.freq} por semana\n• Torneios: ${A.torneio}\n• Desconforto: ${A.dor}\n• O que incomoda: ${A.incomoda}\n• Raquete: ${A.raquete}\nQuero saber como funciona a consultoria!\n(origem: quiz / ${origem})`;
   reply.innerHTML=`<a class="wa" id="wa" target="_blank" rel="noopener" href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}">${WA_ICON}Falar com a Vanessa</a><div class="fine">Consultoria de equipamento. Não substitui avaliação médica.</div>`;
   document.getElementById('wa').onclick=()=>track('Contact',{content_category:A.categoria,content_name:P.n});
