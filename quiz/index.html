@@ -98,9 +98,9 @@ const scroll=()=>chat.scrollTop=chat.scrollHeight;
 async function say(html){
   st.textContent="digitando…";
   const t=document.createElement('div');t.className='typing';t.innerHTML='<i></i><i></i><i></i>';chat.appendChild(t);scroll();
-  await wait(Math.min(700+html.replace(/<[^>]+>/g,'').length*20,2300));
+  await wait(Math.min(400+html.replace(/<[^>]+>/g,'').length*9,1200));
   t.remove();st.textContent="Online agora";
-  chat.querySelectorAll('.ln.last').forEach(x=>x.classList.remove('last'));const l=document.createElement('div');l.className='ln last';l.innerHTML='<div class="mini"><img src="/img/vanessa-perfil.jpg" alt=""></div>';const m=document.createElement('div');m.className='m v';m.innerHTML=html;l.appendChild(m);chat.appendChild(l);scroll();await wait(450);
+  chat.querySelectorAll('.ln.last').forEach(x=>x.classList.remove('last'));const l=document.createElement('div');l.className='ln last';l.innerHTML='<div class="mini"><img src="/img/vanessa-perfil.jpg" alt=""></div>';const m=document.createElement('div');m.className='m v';m.innerHTML=html;l.appendChild(m);chat.appendChild(l);scroll();await wait(220);
 }
 function me(text){const m=document.createElement('div');m.className='m u';m.textContent=text;chat.appendChild(m);scroll()}
 function choose(opts){return new Promise(res=>{reply.innerHTML='';opts.forEach(o=>{const b=document.createElement('button');b.className='chip';b.textContent=o;b.onclick=()=>{reply.innerHTML='';me(o);res(o)};reply.appendChild(b)})})}
