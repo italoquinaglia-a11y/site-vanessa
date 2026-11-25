@@ -306,3 +306,7 @@ if __name__ == "__main__":
     write("diagnostico/index.html", page("Pré-avaliação da sua raquete | Vanessa Kreitchmann",
         "Responda 5 perguntas rápidas e receba a sua pré-avaliação no WhatsApp.",
         chat, "", robots="noindex"))
+    quiz = (ROOT / "quiz" / "quiz.html").read_text(encoding="utf-8")
+    write("quiz/index.html", page("Sua raquete combina com o seu jogo? | Vanessa Kreitchmann",
+        "Teste rápido de 1 minuto: descubra seu perfil de jogo e o que pode estar te travando em quadra.",
+        quiz, "", robots="noindex"))
