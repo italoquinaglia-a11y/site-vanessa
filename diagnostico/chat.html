@@ -81,11 +81,22 @@ const track=(ev,data)=>{try{fbq('track',ev,data)}catch(e){}try{ttq.track(ev==='C
     : ini ? `Obrigada, ${A.nome}! Pra quem tá começando, <b>acertar a primeira raquete</b> faz o jogo evoluir bem mais rápido.`
     : comp ? `Obrigada, ${A.nome}! Na categoria ${A.categoria}, <b>a configuração certa</b> faz muita diferença em controle e consistência nos torneios.`
     : `Obrigada, ${A.nome}! Com peso, balance e EVA alinhados ao teu estilo, dá pra ganhar controle e conforto.`);
-  const precoPixBlack = "R$ 312,00";
-  await say(`Funciona assim: a <b>Consultoria Completa</b> é uma videochamada de 30 a 45 minutos comigo, com acompanhamento da adaptação. <b>Black Friday:</b> de <del>R$ 390,00</del> por <b>${precoPixBlack} no Pix</b>. No cartão, <b>R$ 415 em até 2x</b>.`);
+  const fimPromocao = Date.parse("2026-12-02T00:00:00-03:00");
+  const precoPromocional = { pix: 312, cartao: 348 };
+  const precoNormal = { pix: 390, cartao: 415 };
+  const precoAtual = () => Date.now() < fimPromocao ? precoPromocional : precoNormal;
+  const investimento = ({ pix, cartao }) => `Investimento: <b>R$ ${pix} no PIX ou R$ ${cartao} em até 2x no crédito</b>.`;
+  const opcoes = ({ pix, cartao }) => [`Completa — R$ ${pix} no PIX`, `Completa — R$ ${cartao} em até 2x no crédito`, "Express — R$ 197", "Quero tirar dúvidas antes"];
+  let preco = precoAtual();
+  await say(`Funciona assim: a <b>Consultoria Completa</b> é uma videochamada de 30 a 45 minutos comigo, com acompanhamento da adaptação. ${investimento(preco)}`);
   await say("Também tem a <b>Consultoria Express</b> por <b>R$ 197</b>, com análise por áudio e mensagem, sem videochamada.");
   await say("Qual faz mais sentido pra você?");
-  A.opcao=await choose([`Completa — Pix ${precoPixBlack} (Black Friday)`,"Completa — cartão 2x R$ 415","Express — R$ 197","Quero tirar dúvidas antes"]);
+  A.opcao = await choose(opcoes(preco));
+  if (A.opcao.startsWith("Completa") && preco !== precoAtual()) {
+    preco = precoAtual();
+    await say(`A promoção terminou. ${investimento(preco)} Qual opção faz mais sentido pra você?`);
+    A.opcao = await choose(opcoes(preco));
+  }
   await say(A.opcao.startsWith("Quero")?"Claro! Me chama no WhatsApp que eu te explico tudo 💛":"Perfeito! Me chama no WhatsApp que eu já recebo tuas respostas e te passo os horários e os próximos passos 💛");
   const msg=`Oi Vanessa! Sou ${A.nome} e fiz a pré-avaliação da raquete:\n• Categoria: ${A.categoria}\n• Jogo: ${A.freq} por semana\n• Desconforto: ${A.dor}\n• Raquete: ${A.raquete}\n• Interesse: ${A.opcao}\n(origem: ${origem})`;
   reply.innerHTML=`<a class="wa" id="wa" target="_blank" rel="noopener" href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}">${WA_ICON}Continuar no WhatsApp</a><div class="fine">Consultoria de equipamento. Não substitui avaliação médica.</div>`;
